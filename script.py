@@ -74,12 +74,10 @@ def getSurgeries(patientDF, files):
         if pront > 0:
             utilizaveis.append(prontuarios[ind-1])
     if len(utilizaveis)>2 or len(utilizaveis) == 0:
-        errors.append(patientDF['Nome'][0])
-        erros.at[erros.shape[0],'Nome'] = errors[-1]
+        addToErrors(patientDF, "muitosOuNenhumUtilizavel")
     elif len(utilizaveis) == 2:
         if patientDF.loc[1]['Olho'] == patientDF.loc[2]['Olho']:
-            errors.append(patientDF['Nome'][0])
-            erros.at[erros.shape[0],'Nome'] = errors[-1]
+            addToErrors(patientDF, "olhoRepetido")
             return patientDF, []
 
     if patientDF.loc[0]['Olho'] == None:
@@ -88,6 +86,17 @@ def getSurgeries(patientDF, files):
     #os.system('taskkill /f /im chrome.exe')
 
     return patientDF, utilizaveis
+
+
+def addToErrors(patientDF, reason=-1):
+    errors.append(patientDF['Nome'][0])  # global variable access
+    if not isinstance(erros, pandas.DataFrame):
+        raise Exception("{} não é do tipo esperado, esperava {}".format(erros.__class__, pandas.DataFrame.__class__))
+    lastPos = erros.shape[0]
+    erros.loc[lastPos, ["Nome", "Motivo"]] = [errors[-1], reason]  # global variable access
+
+
+
 
 #Gambiarra, salva os dados no prontuário e avança para a próxima tela
 def storeSave(instance,flag):
