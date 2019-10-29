@@ -2,11 +2,8 @@ import os
 import datetime
 import subprocess
 import pandas
-import openpyxl
 import tkinter as tk
 from tkinter import messagebox
-from os import getcwd
-
 #Inicialização de variáveis
 currDir = os.getcwd()
 patients = [];
@@ -170,7 +167,6 @@ def prontuario(patientDF, currFile, totalFiles):
 
 #Função do botão
 def descricoesCirurgicas():
-    desc = []
     for file in os.listdir():
         if "DESCR" in file:
             subprocess.Popen([chrome_path, file])
