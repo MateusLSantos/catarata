@@ -42,7 +42,15 @@ erros = pandas.read_excel("Erros.xlsx")
 xyProntuario = "500x250"
 xyFichas = "500x350"
 
-os.chdir("./Pacientes")
+try:
+    os.chdir("./Pacientes")
+except FileNotFoundError as e:
+    messagebox.showerror("Erro ao acessar pasta Pacientes", "Não foi possível encontrar a pasta Pacientes, "
+                                                            "verifique se ela existe ou se está no diretório certo.")
+    print("diretório atual contém os seguintes pastas e arquivos: {}".format(os.listdir(".")))
+    raise FileNotFoundError("\nPasta Pacientes não encontrada, é possível que o nome esteja errado, ou que ela não "
+                            "tenha sido criada.")
+
 patients = sorted(os.listdir("."))
 
 def ordenarArquivos(files):
