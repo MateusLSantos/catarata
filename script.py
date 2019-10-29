@@ -3,13 +3,37 @@ import datetime
 import subprocess
 import pandas
 import tkinter as tk
+import platform
 from tkinter import messagebox
 #Inicialização de variáveis
 currDir = os.getcwd()
 patients = [];
 errors = [];
-#chrome_path = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
-chrome_path = "firefox"
+
+if platform.system() == "Windows":
+    navegador = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+else:
+    navegador = "firefox"
+
+
+class Visualizador:
+    def __init__(self, path, openFileFunction):
+        self.path = path
+        self.function = openFileFunction
+
+    def ver(self, filepath):
+        try:
+            self.function([self.path, filepath])
+        except FileNotFoundError as e:
+            messagebox.showerror("Erro ao abrir arquivo", "O caminho do navegador ou do arquivo não puderam ser "
+                                                          "usados. Verifique se o caminho do navegador está correto ou "
+                                                          "se o arquivo que tentou acessar existe.")
+            errorMsg = "A tentativa de usar navegador em [{}] para acessar [{}] falhou"\
+                .format(self.path, os.getcwd()+"/"+filepath)
+            raise FileNotFoundError(errorMsg) from e
+
+
+visualizador = Visualizador(navegador, subprocess.Popen)
 stop = False
 save = False
 forward = 0
@@ -53,7 +77,7 @@ def getSurgeries(patientDF, files):
     ind = 0
     patientDF = patientDF
     while(ind<len(prontuarios) and not stop):
-        subprocess.Popen([chrome_path, prontuarios[ind]])
+        visualizador.ver(prontuarios[ind])
         patientDF, pront = prontuario(patientDF, ind+1, len(prontuarios))
         if patientDF['Nome'][0] in errors:
             return patientDF, [];
@@ -169,7 +193,7 @@ def prontuario(patientDF, currFile, totalFiles):
 def descricoesCirurgicas():
     for file in os.listdir():
         if "DESCR" in file:
-            subprocess.Popen([chrome_path, file])
+            visualizador.ver(file)
 
 
 #Salva os dados coletados na interface para o dataframe do paciente, criando uma entrada para cada cirurgia.
@@ -407,7 +431,7 @@ def getFichas(patientDF, fichas, boolean):
     while not stop:
         if patientDF['Nome'][0] in errors:
             return (createPatientDF(None).drop(index=0))
-        subprocess.Popen([chrome_path, fichas[ind]])
+        visualizador.ver(fichas[ind])
         patientDF, flag = ficha(patientDF, boolean, ind+1, len(fichas))
         if stop:
             return createPatientDF("STOP");
