@@ -375,7 +375,13 @@ def ficha(patientDF, pre, currFile, totalFiles):
     tk.Label(root, text="Eixo OE").grid(row=7)
     tk.Label(root, text="Acuidade OE").grid(row=8)
     tk.Label(root, text="Usei AR (Deixar vazio se não usou)").grid(row=9)
-    tk.Label(root, text="Data da Cirurgia: " + str(patientDF['Data da cirurgia'][0].day) + '/' + str(patientDF['Data da cirurgia'][0].month) + '/' + str(patientDF['Data da cirurgia'][0].year) ).grid(row=12)
+    try:
+        tk.Label(root, text="Data da Cirurgia: " + str(patientDF['Data da cirurgia'][0].day) + '/' + str(patientDF['Data da cirurgia'][0].month) + '/' + str(patientDF['Data da cirurgia'][0].year) ).grid(row=12)
+    except AttributeError as e:
+        errorMsg = "Algo deu errado ao ler a data da cirurgia inserida. Informação reecbida: {}"\
+            .format(patientDF["Data da cirurgia"][0])
+        messagebox.showerror("Erro ao interpretar data da cirurgia",errorMsg)
+        raise e
 
     data = tk.StringVar()
     esfE = tk.StringVar()
